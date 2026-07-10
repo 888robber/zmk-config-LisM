@@ -25,8 +25,9 @@
 &central_listener {
     status = "okay";
     device = <&trackball_central>;
-    input-processors = 
-        <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
+    input-processors =
+        <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
+        <&lism_aml_temp_layer 1 1000>;
 
     scroller {
         layers = <2>;
@@ -42,5 +43,14 @@
         compatible = "lism,trackball-rpc";
         status = "okay";
         device = <&trackball_central>;
+    };
+
+    // オートマチックマウスレイヤー: トラックボール操作中はMouse Layer(1)を
+    // 一時的に有効化し、一定時間操作がなければ自動的に戻る。
+    // 待機時間(param2の1000はプレースホルダ)はLisMアプリからその場で変更可能。
+    lism_aml_temp_layer: lism_aml_temp_layer {
+        compatible = "lism,input-processor-temp-layer";
+        #input-processor-cells = <2>;
+        status = "okay";
     };
 };
