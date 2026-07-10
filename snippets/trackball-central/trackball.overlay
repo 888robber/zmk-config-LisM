@@ -1,3 +1,5 @@
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
 / {
     chosen {
         zmk,kscan = &kscan1;
@@ -33,7 +35,8 @@
         layers = <2>;
         input-processors =
             <&zip_xy_to_scroll_mapper>,
-            <&zip_scroll_scaler 1 16>;
+            <&zip_scroll_scaler 1 16>,
+            <&lism_scroll_invert>;
     };
 };
 
@@ -52,5 +55,14 @@
         compatible = "lism,input-processor-temp-layer";
         #input-processor-cells = <2>;
         status = "okay";
+    };
+
+    // スクロール方向反転: ON/OFFはLisMアプリからその場で変更可能
+    lism_scroll_invert: lism_scroll_invert {
+        compatible = "lism,input-processor-runtime-scroll-invert";
+        #input-processor-cells = <0>;
+        status = "okay";
+        type = <INPUT_EV_REL>;
+        codes = <INPUT_REL_WHEEL INPUT_REL_HWHEEL>;
     };
 };
