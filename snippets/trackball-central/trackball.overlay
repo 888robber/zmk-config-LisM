@@ -29,6 +29,7 @@
     device = <&trackball_central>;
     input-processors =
         <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
+        <&lism_accel>,
         <&lism_aml_temp_layer 1 1000>;
 
     scroller {
@@ -64,5 +65,13 @@
         status = "okay";
         type = <INPUT_EV_REL>;
         codes = <INPUT_REL_WHEEL INPUT_REL_HWHEEL>;
+    };
+
+    // カーソル加速カーブ: 有効/最大倍率/効き始める速度/立ち上がりの幅は
+    // すべてLisMアプリからその場で変更可能（デフォルトはオフ）
+    lism_accel: lism_accel {
+        compatible = "lism,input-processor-accel";
+        #input-processor-cells = <0>;
+        status = "okay";
     };
 };
