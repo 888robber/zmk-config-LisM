@@ -42,10 +42,15 @@
     };
 
     // I+O同時押し(lism.keymapのcombos参照)でGesture Layer(6)の間だけ、
-    // トラックボールの動きをスワイプジェスチャーとして扱う
+    // トラックボールの動きをスワイプジェスチャーとして扱う。
+    // レイヤー条件付きのこのサブノードは親のinput-processorsを引き継がない
+    // ため、通常のカーソル移動と同じ軸反転(zip_xy_transform)をここでも
+    // 明示的にかけて、ジェスチャー方向が逆に感じられないようにする。
     gesture {
         layers = <6>;
-        input-processors = <&lism_gesture>;
+        input-processors =
+            <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
+            <&lism_gesture>;
     };
 };
 
