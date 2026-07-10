@@ -1,4 +1,5 @@
 #include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <dt-bindings/zmk/keys.h>
 
 / {
     chosen {
@@ -39,6 +40,13 @@
             <&zip_scroll_scaler 1 16>,
             <&lism_scroll_invert>;
     };
+
+    // I+O同時押し(lism.keymapのcombos参照)でGesture Layer(6)の間だけ、
+    // トラックボールの動きをスワイプジェスチャーとして扱う
+    gesture {
+        layers = <6>;
+        input-processors = <&lism_gesture>;
+    };
 };
 
 // LisMアプリからのライブ設定用RPCサービス（トラックボール感度・スクロール方向・AML閾値）
@@ -73,5 +81,20 @@
         compatible = "lism,input-processor-accel";
         #input-processor-cells = <0>;
         status = "okay";
+    };
+
+    // トラックボールのスワイプジェスチャー → macOS標準のMission Control
+    // ショートカット（追加のMacアプリ側ヘルパー不要、Ctrl+矢印キーを送るだけ）
+    lism_gesture: lism_gesture {
+        compatible = "lism,input-processor-gesture";
+        #input-processor-cells = <0>;
+        status = "okay";
+        threshold = <300>;
+        cooldown-ms = <300>;
+        bindings =
+            <&kp LC(LEFT)>,   // 左に振る: 前のデスクトップへ
+            <&kp LC(RIGHT)>,  // 右に振る: 次のデスクトップへ
+            <&kp LC(UP)>,     // 上に振る: Mission Control
+            <&kp LC(DOWN)>;   // 下に振る: App Expose
     };
 };
