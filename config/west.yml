@@ -8,6 +8,8 @@ manifest:
       url-base: https://github.com/caksoylar
     - name: 4mplelab
       url-base: https://github.com/4mplelab
+    - name: 888robber
+      url-base: https://github.com/888robber
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -22,5 +24,8 @@ manifest:
     - name: zmk-feature-charge-indicator
       remote: 4mplelab
       revision: main
+    - name: zmk-feature-trackball-rpc
+      remote: 888robber
+      revision: 75027d7c68eb761a28ac42c9b0424cb6376e7d34
   self:
     path: config

@@ -1,3 +1,6 @@
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <dt-bindings/zmk/keys.h>
+
 / {
     chosen {
         zmk,kscan = &kscan1;
@@ -25,13 +28,78 @@
 &central_listener {
     status = "okay";
     device = <&trackball_central>;
-    input-processors = 
-        <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
+    input-processors =
+        <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
+        <&lism_accel>,
+        <&lism_aml_temp_layer 1 1000>;
 
     scroller {
         layers = <2>;
-        input-processors = 
+        input-processors =
             <&zip_xy_to_scroll_mapper>,
-            <&zip_scroll_scaler 1 16>;
+            <&zip_scroll_scaler 1 16>,
+            <&lism_scroll_invert>;
+    };
+
+    // I+O同時押し(lism.keymapのcombos参照)でGesture Layer(6)の間だけ、
+    // トラックボールの動きをスワイプジェスチャーとして扱う。
+    // レイヤー条件付きのこのサブノードは親のinput-processorsを引き継がない
+    // ため、通常のカーソル移動と同じ軸反転(zip_xy_transform)をここでも
+    // 明示的にかけて、ジェスチャー方向が逆に感じられないようにする。
+    gesture {
+        layers = <6>;
+        input-processors =
+            <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
+            <&lism_gesture>;
+    };
+};
+
+// LisMアプリからのライブ設定用RPCサービス（トラックボール感度・スクロール方向・AML閾値）
+/ {
+    trackball_rpc: trackball_rpc {
+        compatible = "lism,trackball-rpc";
+        status = "okay";
+        device = <&trackball_central>;
+    };
+
+    // オートマチックマウスレイヤー: トラックボール操作中はMouse Layer(1)を
+    // 一時的に有効化し、一定時間操作がなければ自動的に戻る。
+    // 待機時間(param2の1000はプレースホルダ)はLisMアプリからその場で変更可能。
+    lism_aml_temp_layer: lism_aml_temp_layer {
+        compatible = "lism,input-processor-temp-layer";
+        #input-processor-cells = <2>;
+        status = "okay";
+    };
+
+    // スクロール方向反転: ON/OFFはLisMアプリからその場で変更可能
+    lism_scroll_invert: lism_scroll_invert {
+        compatible = "lism,input-processor-runtime-scroll-invert";
+        #input-processor-cells = <0>;
+        status = "okay";
+        type = <INPUT_EV_REL>;
+        codes = <INPUT_REL_WHEEL INPUT_REL_HWHEEL>;
+    };
+
+    // カーソル加速カーブ: 有効/最大倍率/効き始める速度/立ち上がりの幅は
+    // すべてLisMアプリからその場で変更可能（デフォルトはオフ）
+    lism_accel: lism_accel {
+        compatible = "lism,input-processor-accel";
+        #input-processor-cells = <0>;
+        status = "okay";
+    };
+
+    // トラックボールのスワイプジェスチャー → macOS標準のMission Control
+    // ショートカット（追加のMacアプリ側ヘルパー不要、Ctrl+矢印キーを送るだけ）
+    lism_gesture: lism_gesture {
+        compatible = "lism,input-processor-gesture";
+        #input-processor-cells = <0>;
+        status = "okay";
+        threshold = <300>;
+        cooldown-ms = <300>;
+        bindings =
+            <&kp LC(LEFT)>,   // 左に振る: 前のデスクトップへ
+            <&kp LC(RIGHT)>,  // 右に振る: 次のデスクトップへ
+            <&kp LC(UP)>,     // 上に振る: Mission Control
+            <&kp LC(DOWN)>;   // 下に振る: App Expose
     };
 };

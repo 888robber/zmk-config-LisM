@@ -44,6 +44,20 @@
         };
     };
 
+    // I+O同時押しでGesture Layer(6)に一時的に切替。トラックボールの
+    // スワイプ検出(trackball.overlayのlism_gesture)と組み合わせて、
+    // デスクトップ移動/Mission Controlのジェスチャーを実現する。
+    // 再有効化(2026-07-10): lism_gesture.cをセンサー処理から切り離す
+    // より安全な設計に書き直した版でクリーン検証中。
+    combos {
+        compatible = "zmk,combos";
+        combo_gesture_layer {
+            timeout-ms = <50>;
+            key-positions = <7 8>;
+            bindings = <&mo 6>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
@@ -117,8 +131,7 @@
         };
 
         layer_6 {
-            status = "reserved";
-            display-name = "Brank Layer";
+            display-name = "Gesture Layer";
             bindings = <
                 &trans           &trans             &trans                &trans                  &trans                                                 &trans       &trans           &trans             &trans              &trans
                 &trans           &trans             &trans                &trans                  &trans                                                 &trans       &trans           &trans             &trans              &trans
