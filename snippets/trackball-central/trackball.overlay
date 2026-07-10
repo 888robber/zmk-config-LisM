@@ -30,8 +30,17 @@
 
     scroller {
         layers = <2>;
-        input-processors = 
+        input-processors =
             <&zip_xy_to_scroll_mapper>,
             <&zip_scroll_scaler 1 16>;
+    };
+};
+
+// LisMアプリからのライブ設定用RPCサービス（トラックボール感度・スクロール方向・AML閾値）
+/ {
+    trackball_rpc: trackball_rpc {
+        compatible = "lism,trackball-rpc";
+        status = "okay";
+        device = <&trackball_central>;
     };
 };
