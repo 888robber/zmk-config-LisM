@@ -26,6 +26,6 @@ manifest:
       revision: main
     - name: zmk-feature-trackball-rpc
       remote: 888robber
-      revision: 16c115fdd60af860faf44d9c558f7d83bb799300
+      revision: 75027d7c68eb761a28ac42c9b0424cb6376e7d34
   self:
     path: config
