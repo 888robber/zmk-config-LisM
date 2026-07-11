@@ -131,7 +131,9 @@
                 &trans           &trans             &trans                &trans                  &trans            &trans              &trans           &trans       &trans           &trans             &trans              &trans
                                                     &trans                &trans                  &trans                                                 &trans       &trans           &trans
             >;
-            sensor-bindings = <&encoder_kp LG(EQUAL) LG(MINUS)>;
+            // 実機確認(2026-07-11): 親指を左に回す方向で拡大(Cmd+)になるよう、
+            // 実機テストの結果に合わせて2つの向きを入れ替えた
+            sensor-bindings = <&encoder_kp LG(MINUS) LG(EQUAL)>;
         };
 
         layer_6 {
