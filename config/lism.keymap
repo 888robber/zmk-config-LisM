@@ -22,10 +22,26 @@
             compatible = "zmk,behavior-macro";
             label = "EMOJI";
             #binding-cells = <0>;
-            bindings = 
+            bindings =
                 <&macro_press &kp CAPSLOCK>,
                 <&macro_tap &kp E>,
                 <&macro_release &kp CAPSLOCK>;
+        };
+
+        // Cmd+Shift+= (Cmd+"+" = 拡大)を、単一パラメータに複数の修飾キーを
+        // 詰め込む方式(&kp LS(LG(EQUAL)))ではなく、絵文字マクロと同じ
+        // 明示的な押す→押す→タップ→離す→離すの手順にした。エンコーダー
+        // 経由のCmd+Shift+=がZoom Layerで反応しなかったための対策。
+        zoom_in: zoom_in_macro {
+            compatible = "zmk,behavior-macro";
+            label = "ZOOM_IN";
+            #binding-cells = <0>;
+            bindings =
+                <&macro_press &kp LGUI>,
+                <&macro_press &kp LSHIFT>,
+                <&macro_tap &kp EQUAL>,
+                <&macro_release &kp LSHIFT>,
+                <&macro_release &kp LGUI>;
         };
     };
 
@@ -41,6 +57,15 @@
             compatible = "zmk,behavior-sensor-rotate-var";
             #sensor-binding-cells = <2>;
             bindings = <&kp>, <&kp>;
+        };
+
+        // Zoom Layer専用。1つ目(cw)は普通の&kp(縮小=Cmd+-、実機で動作確認済み)、
+        // 2つ目(ccw)はzoom_inマクロ固定(拡大)。マクロ側は#binding-cells=0な
+        // ので、use-site側の2個目の引数(0)は無視される
+        encoder_zoom: sensor_rotate_zoom {
+            compatible = "zmk,behavior-sensor-rotate-var";
+            #sensor-binding-cells = <2>;
+            bindings = <&kp>, <&zoom_in>;
         };
     };
 
@@ -131,10 +156,12 @@
                 &trans           &trans             &trans                &trans                  &trans            &trans              &trans           &trans       &trans           &trans             &trans              &trans
                                                     &trans                &trans                  &trans                                                 &trans       &trans           &trans
             >;
-            // 実機確認(2026-07-11): 親指を左に回す方向で拡大になるよう向きを調整。
-            // 「拡大」は実際にはCmd+Shift+=(Cmd+"+")なので、Shiftなしの
-            // Cmd+=だけだと反応しないアプリがあった → LS()でShiftを追加
-            sensor-bindings = <&encoder_kp LG(MINUS) LS(LG(EQUAL))>;
+            // 実機確認(2026-07-11): 親指を左に回す方向が拡大になるよう調整済み。
+            // 拡大側はCmd+Shift+=を単一パラメータにまとめる方式(LS(LG(EQUAL)))が
+            // 実機で反応しなかったため、encoder_zoom(マクロで明示的に押す→
+            // 押す→タップ→離す→離す)に切り替えた。縮小(Cmd+-)は元々動作していた
+            // ため&kpのまま。2個目の引数(0)はzoom_inマクロ側では使われない
+            sensor-bindings = <&encoder_zoom LG(MINUS) 0>;
         };
 
         layer_6 {
