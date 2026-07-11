@@ -131,9 +131,10 @@
                 &trans           &trans             &trans                &trans                  &trans            &trans              &trans           &trans       &trans           &trans             &trans              &trans
                                                     &trans                &trans                  &trans                                                 &trans       &trans           &trans
             >;
-            // 実機確認(2026-07-11): 親指を左に回す方向で拡大(Cmd+)になるよう、
-            // 実機テストの結果に合わせて2つの向きを入れ替えた
-            sensor-bindings = <&encoder_kp LG(MINUS) LG(EQUAL)>;
+            // 実機確認(2026-07-11): 親指を左に回す方向で拡大になるよう向きを調整。
+            // 「拡大」は実際にはCmd+Shift+=(Cmd+"+")なので、Shiftなしの
+            // Cmd+=だけだと反応しないアプリがあった → LS()でShiftを追加
+            sensor-bindings = <&encoder_kp LG(MINUS) LS(LG(EQUAL))>;
         };
 
         layer_6 {
