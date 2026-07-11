@@ -118,9 +118,12 @@
             >;
         };
 
+        // マウスレイヤー上でコンボ(2キー同時押し)を押している間だけ一時的に
+        // 重なる透明なレイヤー。キー割り当ては全部&trans(素通し)のままで、
+        // エンコーダーの回転だけをズーム(Cmd+ / Cmd-)に差し替える。
+        // ジェスチャーレイヤー(layer_6)と全く同じ考え方。
         layer_5 {
-            status = "reserved";
-            display-name = "Brank Layer";
+            display-name = "Zoom Layer";
             bindings = <
                 &trans           &trans             &trans                &trans                  &trans                                                 &trans       &trans           &trans             &trans              &trans
                 &trans           &trans             &trans                &trans                  &trans                                                 &trans       &trans           &trans             &trans              &trans
@@ -128,6 +131,7 @@
                 &trans           &trans             &trans                &trans                  &trans            &trans              &trans           &trans       &trans           &trans             &trans              &trans
                                                     &trans                &trans                  &trans                                                 &trans       &trans           &trans
             >;
+            sensor-bindings = <&encoder_kp LG(EQUAL) LG(MINUS)>;
         };
 
         layer_6 {
