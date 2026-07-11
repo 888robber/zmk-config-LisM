@@ -61,11 +61,16 @@
 
         // Zoom Layer専用。1つ目(cw)は普通の&kp(縮小=Cmd+-、実機で動作確認済み)、
         // 2つ目(ccw)はzoom_inマクロ固定(拡大)。マクロ側は#binding-cells=0な
-        // ので、use-site側の2個目の引数(0)は無視される
+        // ので、use-site側の2個目の引数(0)は無視される。
+        // tap-msを既定の5msから伸ばしている: sensor-rotateは「押す→tap-ms後に
+        // 離す」を合成するが、zoom_inマクロは内部に5ステップ(既定でも
+        // 15〜30ms間隔)あり、5msでは「離す」が先に処理されてしまい拡大が
+        // 反応しなかった。マクロが完走できるよう十分な余裕を持たせた
         encoder_zoom: sensor_rotate_zoom {
             compatible = "zmk,behavior-sensor-rotate-var";
             #sensor-binding-cells = <2>;
             bindings = <&kp>, <&zoom_in>;
+            tap-ms = <150>;
         };
     };
 
