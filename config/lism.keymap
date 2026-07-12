@@ -27,22 +27,6 @@
                 <&macro_tap &kp E>,
                 <&macro_release &kp CAPSLOCK>;
         };
-
-        // Cmd+Shift+= (Cmd+"+" = 拡大)を、単一パラメータに複数の修飾キーを
-        // 詰め込む方式(&kp LS(LG(EQUAL)))ではなく、絵文字マクロと同じ
-        // 明示的な押す→押す→タップ→離す→離すの手順にした。エンコーダー
-        // 経由のCmd+Shift+=がZoom Layerで反応しなかったための対策。
-        zoom_in: zoom_in_macro {
-            compatible = "zmk,behavior-macro";
-            label = "ZOOM_IN";
-            #binding-cells = <0>;
-            bindings =
-                <&macro_press &kp LGUI>,
-                <&macro_press &kp LSHIFT>,
-                <&macro_tap &kp EQUAL>,
-                <&macro_release &kp LSHIFT>,
-                <&macro_release &kp LGUI>;
-        };
     };
 
     behaviors {
@@ -57,20 +41,6 @@
             compatible = "zmk,behavior-sensor-rotate-var";
             #sensor-binding-cells = <2>;
             bindings = <&kp>, <&kp>;
-        };
-
-        // Zoom Layer専用。1つ目(cw)は普通の&kp(縮小=Cmd+-、実機で動作確認済み)、
-        // 2つ目(ccw)はzoom_inマクロ固定(拡大)。マクロ側は#binding-cells=0な
-        // ので、use-site側の2個目の引数(0)は無視される。
-        // tap-msを既定の5msから伸ばしている: sensor-rotateは「押す→tap-ms後に
-        // 離す」を合成するが、zoom_inマクロは内部に5ステップ(既定でも
-        // 15〜30ms間隔)あり、5msでは「離す」が先に処理されてしまい拡大が
-        // 反応しなかった。マクロが完走できるよう十分な余裕を持たせた
-        encoder_zoom: sensor_rotate_zoom {
-            compatible = "zmk,behavior-sensor-rotate-var";
-            #sensor-binding-cells = <2>;
-            bindings = <&kp>, <&zoom_in>;
-            tap-ms = <150>;
         };
     };
 
@@ -162,11 +132,12 @@
                                                     &trans                &trans                  &trans                                                 &trans       &trans           &trans
             >;
             // 実機確認(2026-07-11): 親指を左に回す方向が拡大になるよう調整済み。
-            // 拡大側はCmd+Shift+=を単一パラメータにまとめる方式(LS(LG(EQUAL)))が
-            // 実機で反応しなかったため、encoder_zoom(マクロで明示的に押す→
-            // 押す→タップ→離す→離す)に切り替えた。縮小(Cmd+-)は元々動作していた
-            // ため&kpのまま。2個目の引数(0)はzoom_inマクロ側では使われない
-            sensor-bindings = <&encoder_zoom LG(MINUS) 0>;
+            // 拡大側は当初Cmd+Shift+=(2つの修飾キーを同時に使う方式)を試したが、
+            // 単一パラメータにまとめる方式・マクロで明示的に押す方式のどちらも
+            // 実機で問題が起きた(前者は反応せず、後者はエンコーダーの誤作動を
+            // 引き起こした)。安全のため、縮小(Cmd+-)と同じ「修飾キー1つだけ」の
+            // 単純な方式に戻し、拡大にはテンキーの+(KP_PLUS、Shift不要)を使う
+            sensor-bindings = <&encoder_kp LG(MINUS) LG(KP_PLUS)>;
         };
 
         layer_6 {
